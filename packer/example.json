@@ -1,0 +1,33 @@
+{
+    "variables": {
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "region": "us-west-2",
+        "source_ami_filter": {
+            "filters": {
+                "virtualization-type": "hvm",
+                "name": "*ubuntu-xenial-16.04-amd64-server-*",
+                "root-device-type": "ebs"
+            },
+            "owners": ["099720109477"],
+            "most_recent": true
+        },
+        "instance_type": "t2.medium",
+        "ssh_username": "ubuntu",
+        "vpc_id": "vpc-c20b8ca7",
+        "subnet_id": "subnet-726ad705",
+        "ami_name": "packer-example {{timestamp}}"
+    }],
+    "provisioners": [{
+        "type": "ansible",
+        "playbook_file": "./ansible/playbook.yml",
+        "groups": ["webservers"],
+        "ansible_env_vars": [
+            "ANSIBLE_HOST_KEY_CHECKING=False",
+            "ANSIBLE_SSH_ARGS=-vvvv"
+        ],
+        "extra_arguments": ["-vvv"],
+        "user": "ubuntu"
+    }]
+}
