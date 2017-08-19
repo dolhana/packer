@@ -12,14 +12,15 @@ podTemplate(label: 'docker',
         stage('Build') {
             git 'https://github.com/dolhana/packer.git'
             container('docker') {
-                sh "cd docker && docker build -t ${image} ."
+                docker.withRegistry("https://278955949007.dkr.ecr.us-west-2.amazonaws.com", "ecr:us-west-2:jenkins") {
+                    def image = docker.build(image, "docker")
+                    image.push()
+                    image.withRun("build packer/example.json")
+                }
             }
         }
         stage('Publish') {
             container('docker') {
-                docker.withRegistry("https://278955949007.dkr.ecr.us-west-2.amazonaws.com", "ecr:us-west-2:jenkins") {
-                    docker.image("${image}").push()
-                }
             }
         }
     }
