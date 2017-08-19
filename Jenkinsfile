@@ -7,13 +7,13 @@ podTemplate(label: 'docker',
   volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
   ) {
 
-    def packer = "packer"
+    def packerImageName = "packer"
     node('docker') {
         stage('Build') {
             git 'https://github.com/dolhana/packer.git'
             container('docker') {
                 docker.withRegistry("https://278955949007.dkr.ecr.us-west-2.amazonaws.com", "ecr:us-west-2:jenkins") {
-                    def image = docker.build(packer, "docker")
+                    def packer = docker.build("${packerImageName}", "docker")
                     packer.push()
                     packer.withRun("build packer/example.json")
                 }
