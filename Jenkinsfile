@@ -52,7 +52,7 @@ podTemplate(label: 'packer',
             container("packer") {
                 sh "env"
                 dir(path: "packer") {
-                    sh "/bin/packer build --debug --color=false example.json"
+                    sh "/bin/packer build --color=false example.json"
                 }
             }
         }
