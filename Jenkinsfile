@@ -23,22 +23,36 @@ podTemplate(label: 'docker',
     }
 }
 
+def awsAccessKey
+def awsSecretKey
+
+node {
+    withCredentials(
+        bindings: [[$class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "jenkins"]]) {
+        awsAccessKey = env.AWS_ACCESS_KEY_ID
+        awsSecretKey = env.AWS_SECRET_ACCESS_KEY
+    }
+}
+
 podTemplate(label: 'packer',
             containers: [
                 containerTemplate(
                     name: 'packer',
                     image: "${dockerRegistryDomain}/${packerImageName}",
+                    envVars: [
+                        containerEnvVar(key: 'AWS_ACCESS_KEY_ID', value: "${awsAccessKey}"),
+                        containerEnvVar(key: 'AWS_SECRET_ACCESS_KEY', value: "${awsSecretKey}"),
+                    ],
                     ttyEnabled: true,
                     command: 'cat')]) {
     node("packer") {
         stage("Build AMI") {
             checkout scm
             container("packer") {
-                withCredentials(
-                    bindings: [[$class: 'AmazonWebServicesCredentials', credentialsId: "jenkins"]]) {
-                    dir(path: "packer") {
-                        sh "/bin/packer build --debug --color=false example.json"
-                    }
+                sh "env"
+                dir(path: "packer") {
+                    sh "/bin/packer build --debug --color=false example.json"
                 }
             }
         }
