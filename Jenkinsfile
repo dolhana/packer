@@ -35,9 +35,7 @@ podTemplate(label: 'packer',
             checkout scm
             container("packer") {
                 withCredentials(
-                    bindings: [
-                        amazonWebServicesCredentials(credetialId: "jenkins")
-                    ]) {
+                    bindings: [[$class: 'AmazonWebServicesCredentials', credentialsId: "jenkins"]]) {
                     dir(path: "packer") {
                         sh "/bin/packer build --debug --color=false example.json"
                     }
