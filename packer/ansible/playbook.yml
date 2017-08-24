@@ -1,7 +1,8 @@
 ---
 - hosts: webservers
   # remote_user is ignored by packer.
-  remote_user: root
+  remote_user: ubuntu
+  become: yes
   tasks:
     - name: full-upgrade
       apt:
