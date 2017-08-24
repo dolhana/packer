@@ -20,11 +20,19 @@
         "ami_name": "packer-example {{timestamp}}"
     }],
     "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sudo sed -i.bak -e '/Defaults.*requiretty/s/^/#/' /etc/sudoers",
+            "sudo apt-get update -q",
+            "sudo apt-get install -q -y python aptitude"
+        ]
+    },{
         "type": "ansible",
         "playbook_file": "./ansible/playbook.yml",
         "groups": ["webservers"],
         "ansible_env_vars": [
             "ANSIBLE_HOST_KEY_CHECKING=False",
+            "ANSIBLE_NOCOLOR=True",
             "ANSIBLE_SSH_ARGS=-vvvv"
         ],
         "extra_arguments": ["-vvv"],
