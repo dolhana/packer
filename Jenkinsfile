@@ -34,8 +34,11 @@ podTemplate(label: 'packer',
         stage("Build AMI") {
             checkout scm
             container("packer") {
-                dir(path: "packer") {
-                    sh "/bin/packer build --debug --color=false example.json"
+                withCredentials([
+                        amazonWebServicesCredentialsBinding(credetialId: "jenkins")]) {
+                    dir(path: "packer") {
+                        sh "/bin/packer build --debug --color=false example.json"
+                    }
                 }
             }
         }
